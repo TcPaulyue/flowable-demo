@@ -3,6 +3,7 @@ package com.sddm.flowable;
 import com.alibaba.fastjson.JSONObject;
 import com.sddm.flowable.domain.Schema;
 import com.sddm.flowable.service.MyTaskListener;
+import org.apache.commons.io.IOUtils;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +31,7 @@ public class MyRestController {
 
     @Autowired
     MyService myService;
+
 
     @Autowired
     public MyRestController(RuntimeService runtimeService
@@ -79,6 +83,19 @@ public class MyRestController {
         ResponseEntity<JSONObject> response = restTemplate.postForEntity(uri,query,JSONObject.class);
         taskService.complete(task.getId());
         return response.getBody();
+    }
+
+    @GetMapping(value="/{id}/image" , produces = MediaType.IMAGE_JPEG_VALUE)
+    public @ResponseBody byte[] getImage(@PathVariable String id)  throws IOException {
+        try{
+            InputStream in = myService.getDiagram(id);
+            if(in == null)
+                return null;
+            return IOUtils.toByteArray(in);
+        }catch (IOException ex){
+            System.out.println("查看流程图失败");
+            return null;
+        }
     }
 
     @RequestMapping(value="/tasks", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)

@@ -1,12 +1,17 @@
 package com.sddm.flowable;
 
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.*;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -16,12 +21,22 @@ public class MyService {
 
     private final TaskService taskService;
 
+    private final HistoryService historyService;
+
+    private final RepositoryService repositoryService;
+
+    @Autowired
+   ProcessEngine processEngine;
     public List<String> schemaIdList = new ArrayList<>();
 
     @Autowired
-    public MyService(RuntimeService runtimeService, TaskService taskService) {
+    public MyService(RuntimeService runtimeService, TaskService taskService
+                ,HistoryService hitoryService,RepositoryService repositoryService
+                ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
+        this.historyService = hitoryService;
+        this.repositoryService=repositoryService;
     }
 
     public String startMutianProcess() {
@@ -29,6 +44,39 @@ public class MyService {
                 .getProcessInstanceId();
     }
 
+
+    public InputStream getDiagram(String processInstanceId) {
+        //获得流程实例
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId).singleResult();
+        String processDefinitionId = StringUtils.EMPTY;
+        if (processInstance == null) {
+            //查询已经结束的流程实例
+            HistoricProcessInstance processInstanceHistory =
+                    historyService.createHistoricProcessInstanceQuery()
+                            .processInstanceId(processInstanceId).singleResult();
+            if (processInstanceHistory == null)
+                return null;
+            else
+                processDefinitionId = processInstanceHistory.getProcessDefinitionId();
+        } else {
+            processDefinitionId = processInstance.getProcessDefinitionId();
+        }
+
+        //使用宋体
+        String fontName = "宋体";
+        //获取BPMN模型对象
+        BpmnModel model = repositoryService.getBpmnModel(processDefinitionId);
+        //获取流程实例当前的节点，需要高亮显示
+        List<String> currentActs = Collections.EMPTY_LIST;
+        if (processInstance != null)
+            currentActs = runtimeService.getActiveActivityIds(processInstance.getId());
+
+        return processEngine.getProcessEngineConfiguration()
+                .getProcessDiagramGenerator()
+                .generateDiagram(model,"png",currentActs,new ArrayList<String>()
+                ,fontName,fontName,fontName,null,1.0,true);
+    }
 
     public List<Task> getTasks(String assignee) {
         return taskService.createTaskQuery().taskAssignee(assignee).list();

@@ -19,7 +19,6 @@
       </documentation>
       <extensionElements>
         <flowable:field name="schemaId" stringValue="5df1ed8d7a47184df89fde63"/>
-        <
         <flowable:field name="queryExp">
             <flowable:string>${query}</flowable:string>
         </flowable:field>
