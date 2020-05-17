@@ -1,0 +1,29 @@
+{
+   "name":"请假流程",
+   "fields":
+   [
+      {
+         "name":"请假原因",
+         "id":"reason",
+         "placeholder":"empty",
+         "type":"text",
+         "required":true
+      },
+      {
+         "name":"开始时间",
+         "id":"startTime",
+         "placeholder":"empty",
+         "type":"date",
+         "required":true
+      },
+      {
+         "name":"结束时间",
+         "id":"endTime",
+         "placeholder":"empty",
+         "type":"date",
+         "required":true
+      }
+
+   ],
+   "key":"test1"
+}
