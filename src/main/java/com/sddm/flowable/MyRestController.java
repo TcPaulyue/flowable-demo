@@ -51,11 +51,11 @@ public class MyRestController {
             return null;
         }
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        String schemaId = task.getDescription();
+        String fomilyId = task.getDescription();
         RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8000" + "/api/schemas/{schemaId}";
+        String uri = "http://localhost:8000" + "/api/fomily/{fomilyId}";
         Map<String, Object> params = new HashMap<>();
-        params.put("schemaId", schemaId);
+        params.put("fomilyId", fomilyId);
         ResponseEntity<Schema> response = restTemplate.getForEntity(uri,Schema.class,params);
         return response.getBody();
     }
