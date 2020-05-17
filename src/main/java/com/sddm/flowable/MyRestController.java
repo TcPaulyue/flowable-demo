@@ -85,6 +85,30 @@ public class MyRestController {
         return response.getBody();
     }
 
+    @PostMapping(value = "/completeTaskWithVariables/{processInstanceId}")
+    public JSONObject completeTaskWithVariables(@PathVariable String processInstanceId,
+                                   @RequestParam String variables,
+                                   @RequestBody String query){
+        ProcessInstance rpi = runtimeService//
+                .createProcessInstanceQuery()//创建流程实例查询对象
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        if(rpi == null){
+            return new JSONObject();
+        }
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        runtimeService.setVariable(task.getExecutionId(), "queryExp", query);
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8000"+"/api/documents/query";
+        JSONObject postData = new JSONObject();
+        postData.put("query", query);
+        ResponseEntity<JSONObject> response = restTemplate.postForEntity(uri,query,JSONObject.class);
+        Map<String,Object> map = new HashMap<>();
+        map.put("property",variables);
+        taskService.complete(task.getId(),map);
+        return response.getBody();
+    }
+
     @GetMapping(value="/{id}/image" , produces = MediaType.IMAGE_JPEG_VALUE)
     public @ResponseBody byte[] getImage(@PathVariable String id)  throws IOException {
         try{

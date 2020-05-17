@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="bap">
-  <process id="formRequest" name="表单申请流程" isExecutable="true">
-    <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true">
-      <extensionElements>
-      <flowable:field name="startName" stringValue="1" />
-      <flowable:field name="StartTime" stringValue="2" />
-      </extensionElements>
-    </startEvent>
+  <process id="formRequest" name="formRequest" isExecutable="true">
+    <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true"></startEvent>
     <sequenceFlow id="sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c" sourceRef="start" targetRef="viewFormDelegate"></sequenceFlow>
-
-    <serviceTask id="viewFormDelegate" name="展示信息" flowable:class="com.sddm.flowable.service.FormViewDelegate"></serviceTask>
-
-    <userTask id="sid-41AC103F-C991-4438-9B2D-013243854FA9" name="userTask"
-              flowable:assignee="paul" flowable:formKey="test"
-              flowable:formFieldValidation="true" >
+    <serviceTask id="viewFormDelegate" name="发送邮件" flowable:class="com.sddm.flowable.service.FormViewDelegate"></serviceTask>
+    <userTask id="sid-41AC103F-C991-4438-9B2D-013243854FA9" name="userTask" flowable:assignee="paul" flowable:formKey="test"
+              flowable:formFieldValidation="true">
       <documentation>
         5df1eedb7a47184df89fde6a
       </documentation>
       <extensionElements>
         <flowable:field name="schemaId" stringValue="5df1ed8d7a47184df89fde63"/>
         <flowable:field name="queryExp">
-            <flowable:string>${query}</flowable:string>
+          <flowable:string>${query}</flowable:string>
         </flowable:field>
         <flowable:taskListener event="create" class="com.sddm.flowable.service.MyTaskListener">
           <flowable:field name="schemaId">
@@ -30,8 +22,31 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-C4A52F61-2B95-4892-B648-568E99528704" sourceRef="viewFormDelegate" targetRef="sid-41AC103F-C991-4438-9B2D-013243854FA9"></sequenceFlow>
-    <endEvent id="sid-16BD76A0-7781-4198-95C9-9271A2A0F064"></endEvent>
-    <sequenceFlow id="sid-08520874-4500-4EB7-BB75-A0E4BC639679" sourceRef="sid-41AC103F-C991-4438-9B2D-013243854FA9" targetRef="sid-16BD76A0-7781-4198-95C9-9271A2A0F064"></sequenceFlow>
+    <userTask id="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18" name="userTask2" flowable:formFieldValidation="true">
+      <documentation>
+        5df1eedb7a47184df89fde6a
+      </documentation>
+      <extensionElements>
+        <flowable:field name="schemaId" stringValue="5df1ed8d7a47184df89fde63"/>
+        <flowable:field name="queryExp">
+          <flowable:string>${query}</flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-A01D060B-D367-431F-BB09-1F059D5E3DF6" sourceRef="sid-41AC103F-C991-4438-9B2D-013243854FA9" targetRef="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18"></sequenceFlow>
+    <exclusiveGateway id="sid-4E0DABBC-8831-43D8-88C9-E2157985618D"></exclusiveGateway>
+    <sequenceFlow id="sid-28953C8F-AE12-4412-AC6F-7DA921550DB4" sourceRef="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18" targetRef="sid-4E0DABBC-8831-43D8-88C9-E2157985618D"></sequenceFlow>
+    <endEvent id="sid-59A9FD20-6AD9-4BA7-97C9-4C8C0F4190AE"></endEvent>
+    <sequenceFlow id="sid-34A75FCA-19BF-4578-988A-A4A3D4015A3F" sourceRef="sid-4E0DABBC-8831-43D8-88C9-E2157985618D" targetRef="sid-59A9FD20-6AD9-4BA7-97C9-4C8C0F4190AE">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${property == 'pass'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-05C44AB1-5DC3-4DCE-A2FC-32E721631939" sourceRef="sid-4E0DABBC-8831-43D8-88C9-E2157985618D" targetRef="sid-41AC103F-C991-4438-9B2D-013243854FA9">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${property == 'reject'}]]>
+      </conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_formRequest">
     <bpmndi:BPMNPlane bpmnElement="formRequest" id="BPMNPlane_formRequest">
@@ -44,16 +59,36 @@
       <bpmndi:BPMNShape bpmnElement="sid-41AC103F-C991-4438-9B2D-013243854FA9" id="BPMNShape_sid-41AC103F-C991-4438-9B2D-013243854FA9">
         <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="-10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-16BD76A0-7781-4198-95C9-9271A2A0F064" id="BPMNShape_sid-16BD76A0-7781-4198-95C9-9271A2A0F064">
-        <omgdc:Bounds height="28.0" width="28.0" x="370.0" y="16.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18" id="BPMNShape_sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18">
+        <omgdc:Bounds height="80.0" width="100.0" x="370.0" y="-10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="sid-08520874-4500-4EB7-BB75-A0E4BC639679" id="BPMNEdge_sid-08520874-4500-4EB7-BB75-A0E4BC639679">
-        <omgdi:waypoint x="324.95000000000005" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="370.0" y="30.0"></omgdi:waypoint>
+      <bpmndi:BPMNShape bpmnElement="sid-4E0DABBC-8831-43D8-88C9-E2157985618D" id="BPMNShape_sid-4E0DABBC-8831-43D8-88C9-E2157985618D">
+        <omgdc:Bounds height="40.0" width="40.0" x="515.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-59A9FD20-6AD9-4BA7-97C9-4C8C0F4190AE" id="BPMNShape_sid-59A9FD20-6AD9-4BA7-97C9-4C8C0F4190AE">
+        <omgdc:Bounds height="28.0" width="28.0" x="600.0" y="16.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-34A75FCA-19BF-4578-988A-A4A3D4015A3F" id="BPMNEdge_sid-34A75FCA-19BF-4578-988A-A4A3D4015A3F">
+        <omgdi:waypoint x="554.5591869398205" y="30.378205128205128"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0002755524838" y="30.088851884264066"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-28953C8F-AE12-4412-AC6F-7DA921550DB4" id="BPMNEdge_sid-28953C8F-AE12-4412-AC6F-7DA921550DB4">
+        <omgdi:waypoint x="469.94999999999936" y="30.216233766233763"></omgdi:waypoint>
+        <omgdi:waypoint x="515.4130434782609" y="30.41304347826087"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-C4A52F61-2B95-4892-B648-568E99528704" id="BPMNEdge_sid-C4A52F61-2B95-4892-B648-568E99528704">
         <omgdi:waypoint x="179.95" y="30.0"></omgdi:waypoint>
         <omgdi:waypoint x="225.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-A01D060B-D367-431F-BB09-1F059D5E3DF6" id="BPMNEdge_sid-A01D060B-D367-431F-BB09-1F059D5E3DF6">
+        <omgdi:waypoint x="324.94999999999106" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-05C44AB1-5DC3-4DCE-A2FC-32E721631939" id="BPMNEdge_sid-05C44AB1-5DC3-4DCE-A2FC-32E721631939">
+        <omgdi:waypoint x="535.5" y="49.43954194282504"></omgdi:waypoint>
+        <omgdi:waypoint x="535.5" y="121.00000190734863"></omgdi:waypoint>
+        <omgdi:waypoint x="275.0" y="121.00000190734863"></omgdi:waypoint>
+        <omgdi:waypoint x="275.0" y="69.95"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c" id="BPMNEdge_sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c">
         <omgdi:waypoint x="29.949975004446717" y="30.0"></omgdi:waypoint>

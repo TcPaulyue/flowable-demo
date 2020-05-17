@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="bap">
+  <process id="formRequest" name="表单申请流程" isExecutable="true">
+    <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true">
+      <extensionElements>
+      <flowable:field name="startName" stringValue="1" />
+      <flowable:field name="StartTime" stringValue="2" />
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c" sourceRef="start" targetRef="viewFormDelegate"></sequenceFlow>
+
+    <serviceTask id="viewFormDelegate" name="展示信息" flowable:class="com.sddm.flowable.service.FormViewDelegate"></serviceTask>
+
+    <userTask id="sid-41AC103F-C991-4438-9B2D-013243854FA9" name="userTask"
+              flowable:assignee="paul" flowable:formKey="test"
+              flowable:formFieldValidation="true" >
+      <documentation>
+        5df1eedb7a47184df89fde6a
+      </documentation>
+      <extensionElements>
+        <flowable:field name="schemaId" stringValue="5df1ed8d7a47184df89fde63"/>
+        <flowable:field name="queryExp">
+            <flowable:string>${query}</flowable:string>
+        </flowable:field>
+        <flowable:taskListener event="create" class="com.sddm.flowable.service.MyTaskListener">
+          <flowable:field name="schemaId">
+            <flowable:expression>5df1ed8d7a47184df89fde63</flowable:expression>
+          </flowable:field>
+        </flowable:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-C4A52F61-2B95-4892-B648-568E99528704" sourceRef="viewFormDelegate" targetRef="sid-41AC103F-C991-4438-9B2D-013243854FA9"></sequenceFlow>
+    <endEvent id="sid-16BD76A0-7781-4198-95C9-9271A2A0F064"></endEvent>
+    <sequenceFlow id="sid-08520874-4500-4EB7-BB75-A0E4BC639679" sourceRef="sid-41AC103F-C991-4438-9B2D-013243854FA9" targetRef="sid-16BD76A0-7781-4198-95C9-9271A2A0F064"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_formRequest">
+    <bpmndi:BPMNPlane bpmnElement="formRequest" id="BPMNPlane_formRequest">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="viewFormDelegate" id="BPMNShape_viewFormDelegate">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-41AC103F-C991-4438-9B2D-013243854FA9" id="BPMNShape_sid-41AC103F-C991-4438-9B2D-013243854FA9">
+        <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="-10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-16BD76A0-7781-4198-95C9-9271A2A0F064" id="BPMNShape_sid-16BD76A0-7781-4198-95C9-9271A2A0F064">
+        <omgdc:Bounds height="28.0" width="28.0" x="370.0" y="16.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-08520874-4500-4EB7-BB75-A0E4BC639679" id="BPMNEdge_sid-08520874-4500-4EB7-BB75-A0E4BC639679">
+        <omgdi:waypoint x="324.95000000000005" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-C4A52F61-2B95-4892-B648-568E99528704" id="BPMNEdge_sid-C4A52F61-2B95-4892-B648-568E99528704">
+        <omgdi:waypoint x="179.95" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c" id="BPMNEdge_sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c">
+        <omgdi:waypoint x="29.949975004446717" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.000000000000007"></omgdi:waypoint>
+        <omgdi:waypoint x="79.99999999999042" y="30.000000000000007"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
