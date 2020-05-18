@@ -7,9 +7,12 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +30,7 @@ public class MyService {
 
     @Autowired
    ProcessEngine processEngine;
+
     public List<String> schemaIdList = new ArrayList<>();
 
     @Autowired
@@ -82,4 +86,36 @@ public class MyService {
         return taskService.createTaskQuery().taskAssignee(assignee).list();
     }
 
+    public List<String> getProcessDefinitions() throws IOException {
+        ArrayList<String> files = new ArrayList<String>();
+        File file = ResourceUtils.getFile("classpath:processes");
+        File[] tempList = file.listFiles();
+        for (int i = 0; i < tempList.length; i++) {
+            if (tempList[i].isFile()) {
+                String s = tempList[i].getName();
+                int k = s.indexOf('.');
+//                System.out.println(tempList[i].getName());
+                files.add(tempList[i].getName().substring(0,k));
+            }
+            if (tempList[i].isDirectory()) {
+                return null;
+            }
+        }
+        return files;
+    }
+
+
+    public String getBpmnXML(String bpmnName) throws IOException {
+        String bpmn = "processes/"+bpmnName+".bpmn20.xml";
+        Resource resource = new ClassPathResource(bpmn);
+        File file = resource.getFile();
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        String bpmn1="";
+        String s=new String();
+        while((s=br.readLine())!=null){
+            bpmn1+=s;
+        }
+        br.close();
+        return bpmn1;
+    }
 }

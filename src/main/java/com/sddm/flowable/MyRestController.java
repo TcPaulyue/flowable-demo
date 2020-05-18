@@ -26,18 +26,23 @@ public class MyRestController {
 
     private final RuntimeService runtimeService;
     private final TaskService taskService;
-    @Autowired
-    MyTaskListener myTaskListener;
-
-    @Autowired
-    MyService myService;
-
+    private final MyFormService myFormService;
+    private final MyService myService;
 
     @Autowired
     public MyRestController(RuntimeService runtimeService
-            , TaskService taskService) {
+            , TaskService taskService
+            , MyFormService myFormService
+            , MyService myService) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
+        this.myFormService = myFormService;
+        this.myService = myService;
+    }
+
+    @GetMapping("/processDefinitions")
+    public List<String> getProcessDefinitions() throws IOException{
+        return this.myService.getProcessDefinitions();
     }
 
     @PostMapping(value="/process")
@@ -64,49 +69,51 @@ public class MyRestController {
         return response.getBody();
     }
 
-    @PostMapping(value = "/completeTask/{processInstanceId}")
-    public JSONObject completeTask(@PathVariable String processInstanceId,
-                                       @RequestBody String query){
-        ProcessInstance rpi = runtimeService//
-                .createProcessInstanceQuery()//创建流程实例查询对象
-                .processInstanceId(processInstanceId)
-                .singleResult();
-        if(rpi == null){
-            return new JSONObject();
-        }
+    @PostMapping(value="/submitForm/{processInstanceId}")
+    public JSONObject submitForm(@PathVariable String processInstanceId,
+                                        @RequestBody String query){
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        runtimeService.setVariable(task.getExecutionId(), "queryExp", query);
         RestTemplate restTemplate = new RestTemplate();
         String uri = "http://localhost:8000"+"/api/documents/query";
-        JSONObject postData = new JSONObject();
-        postData.put("query", query);
         ResponseEntity<JSONObject> response = restTemplate.postForEntity(uri,query,JSONObject.class);
-        taskService.complete(task.getId());
+        myFormService.submitTaskFormData(task.getExecutionId(),response.getBody());
         return response.getBody();
     }
 
-    @PostMapping(value = "/completeTaskWithVariables/{processInstanceId}")
-    public JSONObject completeTaskWithVariables(@PathVariable String processInstanceId,
-                                   @RequestParam String variables,
-                                   @RequestBody String query){
+    @GetMapping(value="getForm/{taskId}")
+    public JSONObject getForm(@PathVariable String taskId){
+        return myFormService.getTaskFormData(taskId);
+    }
+
+    @PostMapping(value = "/completeTask/{processInstanceId}")
+    public String completeTask(@PathVariable String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
                 .processInstanceId(processInstanceId)
                 .singleResult();
         if(rpi == null){
-            return new JSONObject();
+            return "error";
         }
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        runtimeService.setVariable(task.getExecutionId(), "queryExp", query);
-        RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8000"+"/api/documents/query";
-        JSONObject postData = new JSONObject();
-        postData.put("query", query);
-        ResponseEntity<JSONObject> response = restTemplate.postForEntity(uri,query,JSONObject.class);
+        taskService.complete(task.getId());
+        return task.getExecutionId();
+    }
+
+    @PostMapping(value = "/completeTaskWithVariables/{processInstanceId}")
+    public String completeTaskWithVariables(@PathVariable String processInstanceId,
+                                   @RequestParam String variables){
+        ProcessInstance rpi = runtimeService//
+                .createProcessInstanceQuery()//创建流程实例查询对象
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        if(rpi == null){
+            return "error.";
+        }
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         Map<String,Object> map = new HashMap<>();
         map.put("property",variables);
         taskService.complete(task.getId(),map);
-        return response.getBody();
+        return task.getExecutionId();
     }
 
     @GetMapping(value="/{id}/image" , produces = MediaType.IMAGE_JPEG_VALUE)
@@ -121,40 +128,9 @@ public class MyRestController {
             return null;
         }
     }
-
-    @RequestMapping(value="/tasks", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
-    public List<TaskRepresentation> getTasks(@RequestParam String assignee) {
-        List<Task> tasks = myService.getTasks(assignee);
-        List<TaskRepresentation> dtos = new ArrayList<TaskRepresentation>();
-        for (Task task : tasks) {
-            dtos.add(new TaskRepresentation(task.getId(), task.getName()));
-        }
-        return dtos;
+    @GetMapping(value="/image")
+    public String getXML(@RequestParam(value = "processDefinition", defaultValue = "null") String processDefinition)throws IOException{
+        System.out.println("查看"+processDefinition+"的流程图");
+        return myService.getBpmnXML(processDefinition);
     }
-
-    static class TaskRepresentation {
-
-        private String id;
-        private String name;
-
-        public TaskRepresentation(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public String getId() {
-            return id;
-        }
-        public void setId(String id) {
-            this.id = id;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-
-    }
-
 }

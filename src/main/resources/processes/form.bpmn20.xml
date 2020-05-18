@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="bap">
   <process id="formRequest" name="formRequest" isExecutable="true">
-    <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true"></startEvent>
+    <!--<dataObject id="schemaId" name="schemaId"-->
+                <!--itemSubjectRef="xsd:string">-->
+      <!--<extensionElements>-->
+        <!--<flowable:value>5ec1e50924521d128a258adf</flowable:value>-->
+      <!--</extensionElements>-->
+    <!--</dataObject>-->
+    <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true">
+      <extensionElements>
+        <!--<flowable:field name="schemaId" stringValue="5ec1e50924521d128a258adf"/>-->
+        <flowable:field name="document">
+          <flowable:string>${documentContent}</flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </startEvent>
     <sequenceFlow id="sequenceFlow-2a8cae00-996d-4e75-84fa-2b8477149c6c" sourceRef="start" targetRef="viewFormDelegate"></sequenceFlow>
     <serviceTask id="viewFormDelegate" name="发送邮件" flowable:class="com.sddm.flowable.service.FormViewDelegate"></serviceTask>
     <userTask id="sid-41AC103F-C991-4438-9B2D-013243854FA9" name="请假" flowable:assignee="员工" flowable:formKey="test"
@@ -10,13 +23,13 @@
         5ec1e50924521d128a258adf
       </documentation>
       <extensionElements>
-        <flowable:field name="schemaId" stringValue="5ec1e50924521d128a258adf"/>
+        <!--<flowable:field name="schemaId" stringValue="5ec1e50924521d128a258adf"/>-->
         <flowable:field name="queryExp">
           <flowable:string>${query}</flowable:string>
         </flowable:field>
         <flowable:taskListener event="create" class="com.sddm.flowable.service.MyTaskListener">
-          <flowable:field name="schemaId">
-            <flowable:expression>5ec1e50924521d128a258adf</flowable:expression>
+          <flowable:field name="taskName">
+            <flowable:expression>task1</flowable:expression>
           </flowable:field>
         </flowable:taskListener>
       </extensionElements>
@@ -26,12 +39,14 @@
       <documentation>
         5ec1e60cd458720f3b7c0ff9
       </documentation>
+
       <extensionElements>
         <flowable:field name="schemaId" stringValue="5ec1e60cd458720f3b7c0ff9"/>
         <flowable:field name="queryExp">
           <flowable:string>${query}</flowable:string>
         </flowable:field>
       </extensionElements>
+
     </userTask>
     <sequenceFlow id="sid-A01D060B-D367-431F-BB09-1F059D5E3DF6" sourceRef="sid-41AC103F-C991-4438-9B2D-013243854FA9" targetRef="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18"></sequenceFlow>
     <exclusiveGateway id="sid-4E0DABBC-8831-43D8-88C9-E2157985618D"></exclusiveGateway>

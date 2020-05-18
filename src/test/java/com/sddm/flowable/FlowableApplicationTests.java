@@ -229,21 +229,27 @@ class FlowableApplicationTests {
         String outCome = "sendToParent";
 //        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
 //                .latestVersion().singleResult();
+
         ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
                 .latestVersion().singleResult();
         StartFormData form = formService.getStartFormData(pd.getId());
         FormInfo info = formRepositoryService.getFormModelByKey(form.getFormKey());
-        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(pd.getId(),outCome,properties,pd.getName());
+ //       ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(pd.getId(),outCome,properties,pd.getName());
 
-  //     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("formRequest",variables);
+        Map<String,Object> map = new HashMap<>();
+        map.put("queryExp","abc");
+       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("formRequest",map);
+       Map<String,Object> map1 = runtimeService.getVariables(processInstance.getId());
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-
+        String id = task.getExecutionId();
         List<String> schemaIdList = myService.schemaIdList;
         String descript = task.getDescription();
-       runtimeService.setVariable(task.getExecutionId(), "queryExp", "tc");
+        runtimeService.setVariable(task.getExecutionId(), "queryExp", "tc");
         Map<String, Object> variablesMap = runtimeService.getVariables(task.getExecutionId());
         String queryExp = variablesMap.get("queryExp").toString();
         System.out.println("task内容: "+ task.toString());
+        System.out.println("变量为：" + taskService.getVariable(task.getId(), "personName"));
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
                 .processInstanceId(processInstance.getId())
@@ -256,6 +262,7 @@ class FlowableApplicationTests {
             System.out.println(hpi.getId()+"    "+hpi.getStartTime()+"   "+hpi.getEndTime()+"   "+hpi.getDurationInMillis());
         }
         taskService.completeTaskWithForm(task.getId(),formDefinition.getId(),outCome,properties);
+        Map<String, Object> map2 = runtimeService.getVariables(task.getExecutionId());
         FormModel taskFM = taskService.getTaskFormModel(task.getId()).getFormModel();
         rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
@@ -268,6 +275,7 @@ class FlowableApplicationTests {
                     .singleResult();
             System.out.println(hpi.getId()+"    "+hpi.getStartTime()+"   "+hpi.getEndTime()+"   "+hpi.getDurationInMillis());
         }
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         System.out.println("task内容: "+ task.toString());
 

@@ -1,27 +1,8 @@
 {
-  "type": "object",
-  "title": "empty object",
-  "properties": {
-    "startTime": {
-      "type": "date",
-      "description": "开始时间",
-      "filter": true
-    },
-    "endTime": {
-      "type": "date",
-      "description": "结束时间",
-      "filter": true
-    },
-    "reason": {
-      "type": "text",
-      "description": "请假原因",
-      "filter": true
-    }
+  "task1":{
+    "schemaId":  "5ec1e60cd458720f3b7c0ff9"
   },
-  "description": "test",
-  "required": [
-    "startTime",
-    "endTime",
-    "reason"
-  ]
+  "task2":{
+    "schemaId": "5ec1e50924521d128a258adf"
+  }
 }

@@ -9,18 +9,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MyTaskListener implements TaskListener {
 
-    private Expression schemaId;
+    private Expression taskName;
 
-    public Expression getSchemaId() {
-        return schemaId;
+    public Expression getTaskName() {
+        return taskName;
     }
 
-    public void setSchemaId(Expression schemaId) {
-        this.schemaId = schemaId;
+    public void setTaskName(Expression taskName) {
+        this.taskName = taskName;
     }
 
     @Override
     public void notify(DelegateTask execution) {
-        System.out.println("variables="+ schemaId.getValue(execution));
+        System.out.println("variables="+ taskName.getValue(execution));
     }
 }
