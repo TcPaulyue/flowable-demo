@@ -1,11 +1,10 @@
 package com.sddm.flowable;
 
-import com.alibaba.fastjson.JSON;
+
 import com.alibaba.fastjson.JSONObject;
 import com.sddm.flowable.domain.Schema;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,7 @@ public class MyFormService {
         this.runtimeService = runtimeService;
     }
 
-    public JSONObject getStartFormData(String s) {
+    JSONObject getStartFormData(String s) {
         Map<String,Object> map = runtimeService.getVariables(s);
         return JSONObject.parseObject(map.get("document").toString());
     }
@@ -60,6 +59,11 @@ public class MyFormService {
         return response.getBody();
     }
 
+    String getTaskFormId(String s) {
+        return  taskService.createTaskQuery()
+                .processInstanceId(s).singleResult().getDescription();
+    }
+
     public void saveFormData(String s, Map<String, String> map) {
         runtimeService.setVariables(s,map);
     }
@@ -73,8 +77,5 @@ public class MyFormService {
         return response.getBody();
     }
 
-    String getTaskFormId(String s) {
-        return  taskService.createTaskQuery()
-                .processInstanceId(s).singleResult().getDescription();
-    }
+
 }

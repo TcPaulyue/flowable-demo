@@ -2,7 +2,6 @@ package com.sddm.flowable;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sddm.flowable.domain.Schema;
-import com.sddm.flowable.service.MyTaskListener;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -10,13 +9,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +48,8 @@ public class MyRestController {
     }
 
     @GetMapping(value = "/taskSchemaDefinition")
-    public Schema getTaskSchemaDefinition(@RequestParam(value="processInstanceId")  String processInstanceId){
+    public Schema getTaskSchemaDefinition(
+            @RequestParam(value="processInstanceId")  String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
                 .processInstanceId(processInstanceId)
@@ -64,7 +61,8 @@ public class MyRestController {
         return myFormService.getFormDefinition(fomilyId);
     }
     @GetMapping(value = "/ProcessInstanceSchemaDefinition")
-    public Schema getProcessInstanceSchemaDefinition(@RequestParam(value="processInstanceId")  String processInstanceId){
+    public Schema getProcessInstanceSchemaDefinition(
+            @RequestParam(value="processInstanceId")  String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
                 .processInstanceId(processInstanceId)
@@ -77,15 +75,17 @@ public class MyRestController {
     }
 
     @PostMapping(value="/submitTaskForm")
-    public JSONObject submitTaskForm(@RequestParam(value="processInstanceId") String processInstanceId,
-                                        @RequestBody String query){
+    public JSONObject submitTaskForm(
+            @RequestParam(value="processInstanceId") String processInstanceId,
+            @RequestBody String query){
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         return myFormService.submitTaskFormData(task.getExecutionId(),query);
     }
 
     @PostMapping(value="/submitProcessInstanceForm")
-    public JSONObject submitProcessInstanceForm(@RequestParam(value="processInstanceId") String processInstanceId,
-                                     @RequestBody String query){
+    public JSONObject submitProcessInstanceForm(
+            @RequestParam(value="processInstanceId") String processInstanceId,
+            @RequestBody String query){
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         return myFormService.submitStartFormData(task.getExecutionId(),query);
     }
