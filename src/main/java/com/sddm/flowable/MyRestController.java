@@ -45,13 +45,14 @@ public class MyRestController {
         return this.myService.getProcessDefinitions();
     }
 
-    @PostMapping(value="/process")
-    public String startProcessInstance() {
-        return runtimeService.startProcessInstanceByKey("formRequest")
+    @PostMapping(value="/processInstances/{processDefinitionName}")
+    public String startProcessInstance(@PathVariable String processDefinitionName) {
+        return runtimeService.startProcessInstanceByKey(processDefinitionName)
                 .getProcessInstanceId();
     }
-    @GetMapping(value = "/schemaContent/{processInstanceId}")
-    public Schema getSchemaContent(@PathVariable String processInstanceId){
+
+    @GetMapping(value = "/taskSchemaDefinition")
+    public Schema getTaskSchemaDefinition(@RequestParam(value="processInstanceId")  String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
                 .processInstanceId(processInstanceId)
@@ -59,30 +60,43 @@ public class MyRestController {
         if(rpi == null){
             return null;
         }
-        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        String fomilyId = task.getDescription();
-        RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8000" + "/api/fomily/{fomilyId}";
-        Map<String, Object> params = new HashMap<>();
-        params.put("fomilyId", fomilyId);
-        ResponseEntity<Schema> response = restTemplate.getForEntity(uri,Schema.class,params);
-        return response.getBody();
+        String fomilyId = myFormService.getTaskFormId(processInstanceId);
+        return myFormService.getFormDefinition(fomilyId);
+    }
+    @GetMapping(value = "/ProcessInstanceSchemaDefinition")
+    public Schema getProcessInstanceSchemaDefinition(@RequestParam(value="processInstanceId")  String processInstanceId){
+        ProcessInstance rpi = runtimeService//
+                .createProcessInstanceQuery()//创建流程实例查询对象
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        if(rpi == null){
+            return null;
+        }
+        String fomilyId = myFormService.getStartFormId(processInstanceId);
+        return myFormService.getFormDefinition(fomilyId);
     }
 
-    @PostMapping(value="/submitForm/{processInstanceId}")
-    public JSONObject submitForm(@PathVariable String processInstanceId,
+    @PostMapping(value="/submitTaskForm")
+    public JSONObject submitTaskForm(@RequestParam(value="processInstanceId") String processInstanceId,
                                         @RequestBody String query){
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8000"+"/api/documents/query";
-        ResponseEntity<JSONObject> response = restTemplate.postForEntity(uri,query,JSONObject.class);
-        myFormService.submitTaskFormData(task.getExecutionId(),response.getBody());
-        return response.getBody();
+        return myFormService.submitTaskFormData(task.getExecutionId(),query);
     }
 
-    @GetMapping(value="getForm/{taskId}")
-    public JSONObject getForm(@PathVariable String taskId){
+    @PostMapping(value="/submitProcessInstanceForm")
+    public JSONObject submitProcessInstanceForm(@RequestParam(value="processInstanceId") String processInstanceId,
+                                     @RequestBody String query){
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        return myFormService.submitStartFormData(task.getExecutionId(),query);
+    }
+
+    @GetMapping(value="getTaskFormData")
+    public JSONObject getTaskFormData(@RequestParam(value="taskId") String taskId){
         return myFormService.getTaskFormData(taskId);
+    }
+    @GetMapping(value="getProcessInstanceFormData")
+    public JSONObject getProcessInstanceFormDate(@RequestParam(value="processInstanceId") String processInsatnceId){
+        return myFormService.getStartFormData(processInsatnceId);
     }
 
     @PostMapping(value = "/completeTask/{processInstanceId}")
@@ -128,6 +142,7 @@ public class MyRestController {
             return null;
         }
     }
+
     @GetMapping(value="/image")
     public String getXML(@RequestParam(value = "processDefinition", defaultValue = "null") String processDefinition)throws IOException{
         System.out.println("查看"+processDefinition+"的流程图");

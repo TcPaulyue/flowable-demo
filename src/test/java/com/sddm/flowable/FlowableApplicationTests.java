@@ -237,10 +237,13 @@ class FlowableApplicationTests {
  //       ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(pd.getId(),outCome,properties,pd.getName());
 
         Map<String,Object> map = new HashMap<>();
-        map.put("queryExp","abc");
+        map.put("schemaId","5ec1e50924521d128a258adf");
        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("formRequest",map);
        Map<String,Object> map1 = runtimeService.getVariables(processInstance.getId());
-
+       Map<String,Object> newMap = new HashMap<>();
+        newMap.put("document","abc");
+        runtimeService.setVariables(processInstance.getId(),newMap);
+        map1= runtimeService.getVariables(processInstance.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         String id = task.getExecutionId();
         List<String> schemaIdList = myService.schemaIdList;

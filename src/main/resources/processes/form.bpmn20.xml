@@ -9,7 +9,9 @@
     <!--</dataObject>-->
     <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true">
       <extensionElements>
-        <!--<flowable:field name="schemaId" stringValue="5ec1e50924521d128a258adf"/>-->
+        <flowable:field name="schemaId">
+          <flowable:string>${schemaId}</flowable:string>
+        </flowable:field>
         <flowable:field name="document">
           <flowable:string>${documentContent}</flowable:string>
         </flowable:field>
