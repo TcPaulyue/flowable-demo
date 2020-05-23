@@ -11,7 +11,7 @@
         expressionLanguage="http://www.w3.org/1999/XPath"
         targetNamespace="http://www.flowable.org/processdef">
     <process id="articleReview"
-             name="A simple process for article review." isExecutable="true">
+             name="articleReviewProcess" isExecutable="true">
         <startEvent id="start" />
         <sequenceFlow sourceRef="start" targetRef="reviewArticle" />
         <userTask id="reviewArticle" name="Review the submitted tutorial"

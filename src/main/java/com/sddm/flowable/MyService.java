@@ -37,11 +37,11 @@ public class MyService {
 
     @Autowired
     public MyService(RuntimeService runtimeService, TaskService taskService
-                ,HistoryService hitoryService,RepositoryService repositoryService
+                ,HistoryService historyService,RepositoryService repositoryService
                 ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
-        this.historyService = hitoryService;
+        this.historyService = historyService;
         this.repositoryService=repositoryService;
     }
 
@@ -50,20 +50,19 @@ public class MyService {
                 .getProcessInstanceId();
     }
 
-    public void deployNewProcess(String processName,String process){
+    void updateDeployedProcess(String processName, String process){
         List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
         // 遍历集合，查看内容
         for (ProcessDefinition pd : pds) {
             if(pd.getName().equals(processName)){
-                System.out.println("delete");
+                System.out.println("delete old processDefinition "+processName);
                 repositoryService.deleteDeployment(pd.getDeploymentId());
             }
         }
-        Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
+        Deployment deployment = repositoryService//获取流程定义和部署对象相关的Service
                 .createDeployment()//创建部署对象
                 .addString(processName+".bpmn",process)
                 .deploy();//完成部署
-        System.out.println(deployment.getId()+"     "+deployment.getName());
         System.out.println("Number of process definitions : "
                 + repositoryService.createProcessDefinitionQuery().count());
     }
@@ -106,27 +105,36 @@ public class MyService {
         return taskService.createTaskQuery().taskAssignee(assignee).list();
     }
 
-    public List<String> getProcessDefinitions() throws IOException {
-        ArrayList<String> files = new ArrayList<String>();
-        File file = ResourceUtils.getFile("classpath:processes");
-        File[] tempList = file.listFiles();
-        for (int i = 0; i < tempList.length; i++) {
-            if (tempList[i].isFile()) {
-                String s = tempList[i].getName();
-                int k = s.indexOf('.');
-//                System.out.println(tempList[i].getName());
-                files.add(tempList[i].getName().substring(0,k));
-            }
-            if (tempList[i].isDirectory()) {
-                return null;
-            }
+    List<String> getProcessDefinitions() throws IOException {
+        System.out.println("get deployed Processes.");
+        List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
+        List<String> processDefinitions = new ArrayList<>();
+        for(ProcessDefinition processDefinition:pds){
+            processDefinitions.add(processDefinition.getName());
         }
-        return files;
+        return processDefinitions;
+//        System.out.println("Number of process definitions : "
+//                + repositoryService.createProcessDefinitionQuery().count());
+//        ArrayList<String> files = new ArrayList<String>();
+//        File file = ResourceUtils.getFile("classpath:process");
+//        File[] tempList = file.listFiles();
+//        for (int i = 0; i < tempList.length; i++) {
+//            if (tempList[i].isFile()) {
+//                String s = tempList[i].getName();
+//                int k = s.indexOf('.');
+////                System.out.println(tempList[i].getName());
+//                files.add(tempList[i].getName().substring(0,k));
+//            }
+//            if (tempList[i].isDirectory()) {
+//                return null;
+//            }
+//        }
+//        return files;
     }
 
 
-    public String getBpmnXML(String bpmnName) throws IOException {
-        String bpmn = "processes/"+bpmnName+".bpmn20.xml";
+    String getBpmnXML(String bpmnName) throws IOException {
+        String bpmn = "process/" +bpmnName+".bpmn20.xml";
         Resource resource = new ClassPathResource(bpmn);
         File file = resource.getFile();
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
@@ -137,5 +145,35 @@ public class MyService {
         }
         br.close();
         return bpmn1;
+    }
+
+    public boolean updateBpmnXML(String xml,String processName) {
+        // 标记文件生成是否成功
+        boolean flag = true;
+
+        // 拼接文件完整路径
+        String fullPath = "/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/process/" + processName+ ".bpmn.xml";
+
+        try {
+            // 保证创建一个新文件
+            File file = new File(fullPath);
+            if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) { // 如果已存在,删除旧文件
+                file.delete();
+            }
+            file.createNewFile();
+
+            // 将格式化后的字符串写入文件
+            Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            write.write(xml);
+            write.flush();
+            write.close();
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
     }
 }

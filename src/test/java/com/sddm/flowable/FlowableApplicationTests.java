@@ -126,6 +126,13 @@ class FlowableApplicationTests {
         }
         return result.toString();
     }
+    @Test
+    public void testCreateNewFile() throws IOException{
+        String name = "AskForLeaveProcess";
+        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/process/form.bpmn20.xml");
+        String text = IOUtils.toString(is, "UTF-8");
+        myService.updateBpmnXML(text,name);
+    }
     public boolean createJsonFile(String jsonString) {
         // 标记文件生成是否成功
         boolean flag = true;

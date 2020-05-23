@@ -44,7 +44,7 @@ public class MyRestController {
     @PostMapping(value="/processDefinitions/{processDefinitionName}")
     public String updateProcessDefinition(@PathVariable String processDefinitionName
            ,@RequestBody String xml ) {
-        myService.deployNewProcess(processDefinitionName,xml);
+        myService.updateDeployedProcess(processDefinitionName,xml);
         return "success";
     }
 
@@ -108,7 +108,7 @@ public class MyRestController {
         return myFormService.getStartFormData(processInsatnceId);
     }
 
-    @PostMapping(value = "a")
+    @PostMapping(value = "/completeTask/{processInstanceId}")
     public String completeTask(@PathVariable String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象
