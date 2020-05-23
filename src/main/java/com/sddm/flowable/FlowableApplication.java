@@ -35,7 +35,7 @@ public class FlowableApplication {
                     System.out.println("name:" + pd.getName() + ",");
                     System.out.println("deploymentId:" + pd.getDeploymentId() + ",");
                     System.out.println("version:" + pd.getVersion());
-                    repositoryService.deleteDeployment(pd.getDeploymentId(),true);
+                //    repositoryService.deleteDeployment(pd.getDeploymentId(),true);
                 }
                 System.out.println("Number of process definitions : "
                         + repositoryService.createProcessDefinitionQuery().count());
