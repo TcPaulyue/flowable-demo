@@ -57,9 +57,10 @@ public class MyService {
             if(pd.getName().equals(processName)){
                 System.out.println("delete old processDefinition "+processName);
                 repositoryService.deleteDeployment(pd.getDeploymentId());
+                break;
             }
         }
-        Deployment deployment = repositoryService//获取流程定义和部署对象相关的Service
+        repositoryService//获取流程定义和部署对象相关的Service
                 .createDeployment()//创建部署对象
                 .addString(processName+".bpmn",process)
                 .deploy();//完成部署
@@ -138,22 +139,20 @@ public class MyService {
         Resource resource = new ClassPathResource(bpmn);
         File file = resource.getFile();
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        String bpmn1="";
-        String s=new String();
+        StringBuilder bpmn1= new StringBuilder();
+        String s;
         while((s=br.readLine())!=null){
-            bpmn1+=s;
+            bpmn1.append(s);
         }
         br.close();
-        return bpmn1;
+        return bpmn1.toString();
     }
 
-    public boolean updateBpmnXML(String xml,String processName) {
+    boolean updateBpmnXML(String xml,String processName) {
         // 标记文件生成是否成功
         boolean flag = true;
-
         // 拼接文件完整路径
-        String fullPath = "/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/process/" + processName+ ".bpmn.xml";
-
+        String fullPath = "./src/main/resources/process/" + processName+ ".bpmn.xml";
         try {
             // 保证创建一个新文件
             File file = new File(fullPath);

@@ -129,7 +129,7 @@ class FlowableApplicationTests {
     @Test
     public void testCreateNewFile() throws IOException{
         String name = "AskForLeaveProcess";
-        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/process/form.bpmn20.xml");
+        InputStream is = new FileInputStream("./src/main/resources/process/form.bpmn20.xml");
         String text = IOUtils.toString(is, "UTF-8");
         myService.updateBpmnXML(text,name);
     }
@@ -138,7 +138,7 @@ class FlowableApplicationTests {
         boolean flag = true;
 
         // 拼接文件完整路径
-        String fullPath = "/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/forms/" + "test1.form";
+        String fullPath = "./src/main/resources/forms/" + "test1.form";
         // 生成json格式文件
         try {
             // 保证创建一个新文件
@@ -188,7 +188,7 @@ class FlowableApplicationTests {
 
     @Test
     void getFormFromSchema() throws IOException{
-        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/test.json");
+        InputStream is = new FileInputStream("./src/main/resources/test.json");
         String jsonTxt = IOUtils.toString(is, "UTF-8");
         System.out.println(jsonTxt);
         JSONObject json = JSON.parseObject(jsonTxt);
@@ -227,7 +227,7 @@ class FlowableApplicationTests {
            // repositoryService.deleteDeployment(pd.getDeploymentId(),true);
             System.out.println("11111111");
         }
-        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/form.bpmn20.xml");
+        InputStream is = new FileInputStream("./src/main/resources/form.bpmn20.xml");
         String text = IOUtils.toString(is, "UTF-8");
         Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
                 .createDeployment()//创建部署对象
@@ -243,7 +243,7 @@ class FlowableApplicationTests {
     @Test
     void contextLoads() throws IOException {
 
-//        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/forms/test.form");
+//        InputStream is = new FileInputStream("./src/main/resources/forms/test.form");
 //        String jsonTxt = IOUtils.toString(is, "UTF-8");
 //        System.out.println(jsonTxt);
 //        FormDeployment formDeployment = formRepositoryService.createDeployment()
