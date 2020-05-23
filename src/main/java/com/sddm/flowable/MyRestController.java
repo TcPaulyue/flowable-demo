@@ -41,6 +41,13 @@ public class MyRestController {
         return this.myService.getProcessDefinitions();
     }
 
+    @PostMapping(value="/processDefinitions/{processDefinitionName}")
+    public String updateProcessDefinition(@PathVariable String processDefinitionName
+           ,@RequestBody String xml ) {
+        myService.deployNewProcess(processDefinitionName,xml);
+        return "success";
+    }
+
     @PostMapping(value="/processInstances/{processDefinitionName}")
     public String startProcessInstance(@PathVariable String processDefinitionName) {
         return runtimeService.startProcessInstanceByKey(processDefinitionName)
@@ -60,6 +67,7 @@ public class MyRestController {
         String fomilyId = myFormService.getTaskFormId(processInstanceId);
         return myFormService.getFormDefinition(fomilyId);
     }
+
     @GetMapping(value = "/ProcessInstanceSchemaDefinition")
     public Schema getProcessInstanceSchemaDefinition(
             @RequestParam(value="processInstanceId")  String processInstanceId){
@@ -94,12 +102,13 @@ public class MyRestController {
     public JSONObject getTaskFormData(@RequestParam(value="taskId") String taskId){
         return myFormService.getTaskFormData(taskId);
     }
+
     @GetMapping(value="getProcessInstanceFormData")
     public JSONObject getProcessInstanceFormDate(@RequestParam(value="processInstanceId") String processInsatnceId){
         return myFormService.getStartFormData(processInsatnceId);
     }
 
-    @PostMapping(value = "/completeTask/{processInstanceId}")
+    @PostMapping(value = "a")
     public String completeTask(@PathVariable String processInstanceId){
         ProcessInstance rpi = runtimeService//
                 .createProcessInstanceQuery()//创建流程实例查询对象

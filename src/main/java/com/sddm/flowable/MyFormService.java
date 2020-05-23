@@ -76,6 +76,4 @@ public class MyFormService {
         ResponseEntity<Schema> response = restTemplate.getForEntity(uri,Schema.class,params);
         return response.getBody();
     }
-
-
 }

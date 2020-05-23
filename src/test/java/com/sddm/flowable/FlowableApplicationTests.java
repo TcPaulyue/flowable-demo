@@ -9,14 +9,13 @@ import com.sddm.flowable.service.MyTaskListener;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
+import org.flowable.engine.*;
 import org.flowable.engine.FormService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.*;
 import org.flowable.task.api.Task;
@@ -44,6 +43,8 @@ class FlowableApplicationTests {
     private HistoryService historyService;
     @Autowired
     private FormRepositoryService formRepositoryService;
+    @Autowired
+    private ProcessEngine processEngine;
     @Autowired
     private MyService myService;
 
@@ -203,6 +204,33 @@ class FlowableApplicationTests {
         testForm.put("fields",jsonArray);
         this.createJsonFile(testForm.toString());
         System.out.println(testForm);
+    }
+
+    @Test
+    void deployProcess() throws IOException{
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+        List<ProcessDefinition> pds = processDefinitionQuery.list();
+        System.out.println(pds.size());
+        // 遍历集合，查看内容
+        for (ProcessDefinition pd : pds) {
+            System.out.println("id:" + pd.getId() + ",");
+            System.out.println("name:" + pd.getName() + ",");
+            System.out.println("deploymentId:" + pd.getDeploymentId() + ",");
+            System.out.println("version:" + pd.getVersion());
+           // repositoryService.deleteDeployment(pd.getDeploymentId(),true);
+            System.out.println("11111111");
+        }
+        InputStream is = new FileInputStream("/Users/congtang/Desktop/sddm-backend/flowable/src/main/resources/form.bpmn20.xml");
+        String text = IOUtils.toString(is, "UTF-8");
+        Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
+                .createDeployment()//创建部署对象
+                .addString("helloworld.bpmn",text)
+                .deploy();//完成部署
+        System.out.println("部署ID："+deployment.getId());//1
+        System.out.println("部署key："+deployment.getKey());//1
+        System.out.println("部署时间："+deployment.getDeploymentTime());
+        System.out.println("Number of process definitions : "
+                + repositoryService.createProcessDefinitionQuery().count());
     }
 
     @Test

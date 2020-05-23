@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,24 @@ public class MyService {
     public String startMutianProcess() {
         return runtimeService.startProcessInstanceByKey("mutian-process")
                 .getProcessInstanceId();
+    }
+
+    public void deployNewProcess(String processName,String process){
+        List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
+        // 遍历集合，查看内容
+        for (ProcessDefinition pd : pds) {
+            if(pd.getName().equals(processName)){
+                System.out.println("delete");
+                repositoryService.deleteDeployment(pd.getDeploymentId());
+            }
+        }
+        Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
+                .createDeployment()//创建部署对象
+                .addString(processName+".bpmn",process)
+                .deploy();//完成部署
+        System.out.println(deployment.getId()+"     "+deployment.getName());
+        System.out.println("Number of process definitions : "
+                + repositoryService.createProcessDefinitionQuery().count());
     }
 
 
