@@ -10,7 +10,7 @@
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="bap">
-  <process id="formRequest" name="AskForVacationProcess" isExecutable="true">
+  <process id="AskForVacationProcess" name="AskForVacationProcess" isExecutable="true">
     <startEvent id="start" name="填写表单" flowable:formKey="test" flowable:formFieldValidation="true">
       <extensionElements>
         <flowable:field name="schemaId">
