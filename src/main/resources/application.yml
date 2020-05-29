@@ -1,0 +1,14 @@
+server:
+  port: 8081
+spring:
+  h2:
+    console:
+      path: /h2-console   # h2 web consloe 路径
+      enabled: true       # 开启 h2 web consloe，默认为 false
+      settings:
+        web-allow-others: true    #允许远程访问 h2 web consloe
+  datasource:
+    username: sa
+    url: jdbc:h2:mem:test
+    driver-class-name:  org.h2.Driver
+    password: 1234

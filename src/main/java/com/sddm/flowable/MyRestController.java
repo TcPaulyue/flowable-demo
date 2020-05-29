@@ -3,6 +3,11 @@ package com.sddm.flowable;
 import com.alibaba.fastjson.JSONObject;
 import com.sddm.flowable.domain.Schema;
 import org.apache.commons.io.IOUtils;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -18,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 public class MyRestController {
 
     private final RuntimeService runtimeService;
@@ -90,6 +96,35 @@ public class MyRestController {
         return myFormService.submitTaskFormData(task.getExecutionId(),query);
     }
 
+    @GetMapping(value="/task")
+    public JSONObject getCurrentTask(
+            @RequestParam(value="processInstanceId") String processInstanceId) throws Exception {
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        String taskId = task.getTaskDefinitionKey();
+        String taskName = task.getName();
+        BpmnModel bpmnModel = readXMLFile();
+        //    FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("sid-41AC103F-C991-4438-9B2D-013243854FA9");
+        FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement(taskId);
+        Map<String,List<ExtensionElement>> extensions = flowElement.getExtensionElements();
+  //      List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get("test");
+        JSONObject taskInfo = new JSONObject();
+        taskInfo.put("taskId",taskId);
+        taskInfo.put("taskName",taskName);
+        taskInfo.put("taskExtensions",extensions);
+        return taskInfo;
+    }
+    private BpmnModel readXMLFile() throws Exception {
+        InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
+        return readXMLFile(xmlStream);
+    }
+    private BpmnModel readXMLFile(InputStream inputStream) throws Exception {
+        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(inputStream), true, false, "UTF-8");
+    }
+    private String getResource() {
+        //return "extensions.bpmn20.xml";
+        return "process/AskForVacationProcess.bpmn20.xml";
+    }
+
     @PostMapping(value="/submitProcessInstanceForm")
     public JSONObject submitProcessInstanceForm(
             @RequestParam(value="processInstanceId") String processInstanceId,
@@ -155,6 +190,6 @@ public class MyRestController {
     @GetMapping(value="/image")
     public String getXML(@RequestParam(value = "processDefinition", defaultValue = "null") String processDefinition)throws IOException{
         System.out.println("查看"+processDefinition+"的流程图");
-        return myService.getBpmnXML(processDefinition);
+        return myService.getUpdatedBpmnXml(processDefinition);
     }
 }

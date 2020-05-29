@@ -1,7 +1,6 @@
 package com.sddm.flowable;
 
 import lombok.extern.log4j.Log4j2;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

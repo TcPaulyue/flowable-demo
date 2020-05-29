@@ -1,10 +1,10 @@
 package com.sddm.flowable;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -12,12 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class MyService {
@@ -29,6 +27,8 @@ public class MyService {
     private final HistoryService historyService;
 
     private final RepositoryService repositoryService;
+
+    private static Map<String,String> bpmnDefinitions = new HashMap<>();
 
     @Autowired
    ProcessEngine processEngine;
@@ -45,6 +45,14 @@ public class MyService {
         this.repositoryService=repositoryService;
     }
 
+    @PostConstruct
+    public void init() throws IOException{
+        String s = this.getBpmnXML("AskForVacationProcess");
+        bpmnDefinitions.put("AskForVacationProcess",s);
+        s = this.getBpmnXML("articleReview");
+        bpmnDefinitions.put("articleReview",s);
+    }
+
     public String startMutianProcess() {
         return runtimeService.startProcessInstanceByKey("mutian-process")
                 .getProcessInstanceId();
@@ -56,6 +64,7 @@ public class MyService {
         for (ProcessDefinition pd : pds) {
             if(pd.getName().equals(processName)){
                 System.out.println("delete old processDefinition "+processName);
+                bpmnDefinitions.put(processName,process);
                 repositoryService.deleteDeployment(pd.getDeploymentId());
                 break;
             }
@@ -66,6 +75,7 @@ public class MyService {
                 .deploy();//完成部署
         System.out.println("Number of process definitions : "
                 + repositoryService.createProcessDefinitionQuery().count());
+        //this.updateBpmnXML(process,processName);
     }
 
 
@@ -133,7 +143,6 @@ public class MyService {
 //        return files;
     }
 
-
     String getBpmnXML(String bpmnName) throws IOException {
         String bpmn = "process/" +bpmnName+".bpmn20.xml";
         Resource resource = new ClassPathResource(bpmn);
@@ -148,11 +157,15 @@ public class MyService {
         return bpmn1.toString();
     }
 
+    String getUpdatedBpmnXml(String bpmnName){
+        return bpmnDefinitions.get(bpmnName);
+    }
+
     boolean updateBpmnXML(String xml,String processName) {
         // 标记文件生成是否成功
         boolean flag = true;
         // 拼接文件完整路径
-        String fullPath = "./src/main/resources/process/" + processName+ ".bpmn.xml";
+        String fullPath = "./src/main/resources/process/" + processName+ ".bpmn20.xml";
         try {
             // 保证创建一个新文件
             File file = new File(fullPath);
@@ -165,10 +178,10 @@ public class MyService {
             file.createNewFile();
 
             // 将格式化后的字符串写入文件
-            Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-            write.write(xml);
-            write.flush();
-            write.close();
+            Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            writer.write(xml);
+            writer.flush();
+            writer.close();
         } catch (Exception e) {
             flag = false;
             e.printStackTrace();

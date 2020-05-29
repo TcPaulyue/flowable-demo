@@ -8,6 +8,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.sddm.flowable.service.MyTaskListener;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.*;
 import org.flowable.engine.FormService;
@@ -129,7 +130,7 @@ class FlowableApplicationTests {
     @Test
     public void testCreateNewFile() throws IOException{
         String name = "AskForLeaveProcess";
-        InputStream is = new FileInputStream("./src/main/resources/process/form.bpmn20.xml");
+        InputStream is = new FileInputStream("./src/main/resources/process/AskForVacationProcess.bpmn20.xml");
         String text = IOUtils.toString(is, "UTF-8");
         myService.updateBpmnXML(text,name);
     }
@@ -227,7 +228,7 @@ class FlowableApplicationTests {
            // repositoryService.deleteDeployment(pd.getDeploymentId(),true);
             System.out.println("11111111");
         }
-        InputStream is = new FileInputStream("./src/main/resources/form.bpmn20.xml");
+        InputStream is = new FileInputStream("./src/main/resources/AskForVacationProcess.bpmn20.xml");
         String text = IOUtils.toString(is, "UTF-8");
         Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
                 .createDeployment()//创建部署对象
@@ -238,6 +239,7 @@ class FlowableApplicationTests {
         System.out.println("部署时间："+deployment.getDeploymentTime());
         System.out.println("Number of process definitions : "
                 + repositoryService.createProcessDefinitionQuery().count());
+        
     }
 
     @Test
@@ -262,10 +264,11 @@ class FlowableApplicationTests {
         properties.put("endTime", "2019-02-01");
         properties.put("reason", "回家过年");
         String outCome = "sendToParent";
-//        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
-//                .latestVersion().singleResult();
-
- //       ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
+                .latestVersion().singleResult();
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(pd.getId());
+        System.err.println(bpmnModel);
+        //       ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionKey("formRequest")
  //               .latestVersion().singleResult();
  //       StartFormData form = formService.getStartFormData(pd.getId());
 //        FormInfo info = formRepositoryService.getFormModelByKey(form.getFormKey());

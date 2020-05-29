@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication(proxyBeanMethods = false)
 public class FlowableApplication {
@@ -26,7 +27,7 @@ public class FlowableApplication {
     public CommandLineRunner init(final RepositoryService repositoryService) {
 
         return strings -> {
-            InputStream is = new FileInputStream("./src/main/resources/process/form.bpmn20.xml");
+            InputStream is = new FileInputStream("./src/main/resources/process/AskForVacationProcess.bpmn20.xml");
             String text = IOUtils.toString(is, "UTF-8");
             Deployment deployment = repositoryService//获取流程定义和部署对象相关的Service
                     .createDeployment()//创建部署对象
