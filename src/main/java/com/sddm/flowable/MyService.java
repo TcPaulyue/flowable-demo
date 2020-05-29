@@ -75,7 +75,7 @@ public class MyService {
                 .deploy();//完成部署
         System.out.println("Number of process definitions : "
                 + repositoryService.createProcessDefinitionQuery().count());
-        //this.updateBpmnXML(process,processName);
+        this.updateBpmnXML(process,processName);
     }
 
 
