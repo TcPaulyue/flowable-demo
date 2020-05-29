@@ -1,8 +1,10 @@
 package com.sddm.flowable;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.IOUtils;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.task.api.Task;
@@ -10,7 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
@@ -30,15 +37,22 @@ class formTests {
     private FormRepositoryService formRepositoryService;
 
     @Test
-    void passAllTask() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("mutian-process");
+    void passAllTask() throws IOException {
+        InputStream is = new FileInputStream("./src/main/resources/process/mutian-new.bpmn20.xml");
+        String text = IOUtils.toString(is, "UTF-8");
+        Deployment deployment = repositoryService//获取流程定义和部署对象相关的Service
+                .createDeployment()//创建部署对象
+                .addString("mutian.bpmn",text)
+                .deploy();//完成部署
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("xjbj");
         System.out.println("==============开始流程==============");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         System.out.println("task内容: "+ task.toString());
         System.out.println("==============选择社外(N)==============");
         Map<String,Object> properties = new HashMap<>();
-        properties.put("property","社外(N)");
+        properties.put("quotationForm","2");
         taskService.complete(task.getId(),properties);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 //        UserTask userTask = (UserTask) taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 //        userTask.getExtensionElements()
