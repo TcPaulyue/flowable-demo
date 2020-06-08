@@ -138,6 +138,7 @@ public class FlowableCustomExtensionTest {
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
 
         ObjectNode modelNode = new BpmnJsonConverter().convertToJson(bpmnModel);
+        System.err.println(modelNode);
         // 通过act_de_model中存放的Modeler内容来部署
         Model modelData = repositoryService.newModel();
         modelData.setKey("test");

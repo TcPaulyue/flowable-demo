@@ -33,7 +33,7 @@
     </userTask>
     <userTask id="sid-3A26105A-174C-41C5-A1E9-2A9BA203AE18" name="审批请假单"
               flowable:formFieldValidation="true">
-        <!--<hanyuanxi>pass/reject</hanyuanxi>-->
+
         <extensionElements>
           <custom:schemaId name="schemaId" value="5ec1e60cd458720f3b7c0ff9"/>
           <custom:outgoings name="outgoings" type="enum">

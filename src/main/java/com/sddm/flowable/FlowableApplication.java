@@ -39,6 +39,12 @@ public class FlowableApplication {
                     .createDeployment()//创建部署对象
                     .addString("articleReview.bpmn",text)
                     .deploy();//完成部署
+            is = new FileInputStream("./src/main/resources/process/mutian.bpmn20.xml");
+            text = IOUtils.toString(is, "UTF-8");
+            deployment = repositoryService//获取流程定义和部署对象相关的Service
+                    .createDeployment()//创建部署对象
+                    .addString("mutian.bpmn",text)
+                    .deploy();//完成部署
             System.out.println("Number of process definitions : "
                     + repositoryService.createProcessDefinitionQuery().count());
             List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();

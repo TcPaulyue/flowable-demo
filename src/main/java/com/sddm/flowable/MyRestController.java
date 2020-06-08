@@ -122,6 +122,7 @@ public class MyRestController {
     }
     private String getResource() {
         //return "extensions.bpmn20.xml";
+      //  return myService.bpmnDefinitions.get("AskForVacationProcess");
         return "process/AskForVacationProcess.bpmn20.xml";
     }
 
@@ -171,6 +172,7 @@ public class MyRestController {
         Map<String,Object> map = new HashMap<>();
         map.put("property",variables);
         taskService.complete(task.getId(),map);
+
         return task.getExecutionId();
     }
 

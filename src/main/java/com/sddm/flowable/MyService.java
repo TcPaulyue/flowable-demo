@@ -1,6 +1,6 @@
 package com.sddm.flowable;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
@@ -28,7 +28,7 @@ public class MyService {
 
     private final RepositoryService repositoryService;
 
-    private static Map<String,String> bpmnDefinitions = new HashMap<>();
+    public static Map<String,String> bpmnDefinitions = new HashMap<>();
 
     @Autowired
    ProcessEngine processEngine;
@@ -51,6 +51,8 @@ public class MyService {
         bpmnDefinitions.put("AskForVacationProcess",s);
         s = this.getBpmnXML("articleReview");
         bpmnDefinitions.put("articleReview",s);
+        s = this.getBpmnXML("mutian");
+        bpmnDefinitions.put("mutian",s);
     }
 
     public String startMutianProcess() {

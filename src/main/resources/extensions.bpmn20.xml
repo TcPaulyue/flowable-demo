@@ -12,6 +12,7 @@
                     <custom:path id="path1" value = "pass"/>
                     <custom:path id="path2" value = "reject"/>
                 </custom:outgoings>
+                <custom:property>${}</custom:property>
             </extensionElements>
         </userTask>
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />

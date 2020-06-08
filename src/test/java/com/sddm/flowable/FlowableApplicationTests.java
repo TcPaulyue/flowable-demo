@@ -286,8 +286,11 @@ class FlowableApplicationTests {
         String id = task.getExecutionId();
         List<String> schemaIdList = myService.schemaIdList;
         String descript = task.getDescription();
+
         runtimeService.setVariable(task.getExecutionId(), "queryExp", "tc");
+
         Map<String, Object> variablesMap = runtimeService.getVariables(task.getExecutionId());
+
         String queryExp = variablesMap.get("queryExp").toString();
         System.out.println("task内容: "+ task.toString());
         System.out.println("变量为：" + taskService.getVariable(task.getId(), "personName"));
